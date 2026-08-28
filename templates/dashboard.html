@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | InsurePredict{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-page">
+
+    <div class="container">
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+
+            <div>
+
+                <span class="section-tag">
+                    DASHBOARD
+                </span>
+
+                <h1>
+                    Welcome back, {{ user_name }}!
+                </h1>
+
+                <p>
+                    View your prediction activity and manage your insurance
+                    claim predictions.
+                </p>
+
+            </div>
+
+            <a href="/predict" class="btn btn-primary">
+
+                <i class="bi bi-plus-lg"></i>
+
+                New Prediction
+
+            </a>
+
+        </div>
+
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Predictions</span>
+
+                    <h2>{{ total_predictions or 0 }}</h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <div>
+
+                    <span>Latest Result</span>
+
+                    <h2 class="stat-result">
+                        {{ latest_result or "No Data" }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+
+                <div>
+
+                    <span>Account Status</span>
+
+                    <h2 class="active-status">
+                        Active
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Quick Actions -->
+        <div class="dashboard-section">
+
+            <div class="section-title">
+
+                <div>
+
+                    <h2>Quick Actions</h2>
+
+                    <p>
+                        Access the main features of the system.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="action-grid">
+
+                <a href="/predict" class="action-card">
+
+                    <div class="action-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>Make Prediction</h3>
+
+                        <p>
+                            Enter insurance information and get
+                            an AI-powered prediction.
+                        </p>
+
+                    </div>
+
+                    <i class="bi bi-arrow-right action-arrow"></i>
+
+                </a>
+
+
+                <a href="/history" class="action-card">
+
+                    <div class="action-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>Prediction History</h3>
+
+                        <p>
+                            View your previous insurance claim
+                            predictions.
+                        </p>
+
+                    </div>
+
+                    <i class="bi bi-arrow-right action-arrow"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Recent Predictions -->
+        <div class="dashboard-section recent-section">
+
+            <div class="section-title">
+
+                <div>
+
+                    <h2>Recent Predictions</h2>
+
+                    <p>
+                        Your latest insurance claim prediction activity.
+                    </p>
+
+                </div>
+
+                <a href="/history" class="text-link">
+                    View All
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+            {% if recent_predictions %}
+
+                <div class="recent-predictions">
+
+                    {% for prediction in recent_predictions %}
+
+                        <div class="recent-prediction-card">
+
+                            <div class="prediction-result-icon">
+
+                                {% if prediction.prediction_result == "Claim Likely" %}
+
+                                    <i class="bi bi-exclamation-circle"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-check-circle"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="prediction-info">
+
+                                <h3>
+                                    {{ prediction.prediction_result }}
+                                </h3>
+
+                                <p>
+                                    Probability:
+                                    {{ prediction.probability }}%
+                                </p>
+
+                            </div>
+
+
+                            <div class="prediction-date">
+
+                                {{ prediction.prediction_date }}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+
+                    <h3>No Predictions Yet</h3>
+
+                    <p>
+                        Start by making your first insurance claim prediction.
+                    </p>
+
+                    <a href="/predict" class="btn btn-primary">
+                        Make First Prediction
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

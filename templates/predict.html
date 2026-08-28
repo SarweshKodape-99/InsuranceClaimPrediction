@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}Make Prediction | InsurePredict{% endblock %}
+
+
+{% block content %}
+
+<section class="predict-page">
+
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+
+            <span class="section-tag">
+                AI PREDICTION
+            </span>
+
+            <h1>Insurance Claim Prediction</h1>
+
+            <p>
+                Enter the required insurance information below and let our
+                machine learning model analyze the data.
+            </p>
+
+        </div>
+
+
+        <div class="prediction-layout">
+
+            <!-- Prediction Form -->
+            <div class="prediction-form-card">
+
+                <div class="form-card-header">
+
+                    <div class="form-header-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+
+                    <div>
+                        <h2>Enter Information</h2>
+                        <p>
+                            Fill in all the required details accurately.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <form action="/predict" method="POST" class="prediction-form">
+
+                    <!-- Personal Information -->
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+
+                            <i class="bi bi-person"></i>
+
+                            <div>
+                                <h3>Personal Information</h3>
+                                <p>Basic customer details</p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+                            <!-- Age -->
+                            <div class="form-group">
+
+                                <label for="age">Age</label>
+
+                                <input
+                                    type="number"
+                                    id="age"
+                                    name="age"
+                                    min="18"
+                                    max="100"
+                                    placeholder="Enter age"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- Sex -->
+                            <div class="form-group">
+
+                                <label for="sex">Gender</label>
+
+                                <select
+                                    id="sex"
+                                    name="sex"
+                                    required
+                                >
+
+                                    <option value="" selected disabled>
+                                        Select gender
+                                    </option>
+
+                                    <option value="0">Female</option>
+                                    <option value="1">Male</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- BMI -->
+                            <div class="form-group">
+
+                                <label for="bmi">
+                                    BMI
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="bmi"
+                                    name="bmi"
+                                    step="0.01"
+                                    min="10"
+                                    max="60"
+                                    placeholder="e.g. 25.5"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- Children -->
+                            <div class="form-group">
+
+                                <label for="children">
+                                    Number of Children
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="children"
+                                    name="children"
+                                    min="0"
+                                    max="10"
+                                    placeholder="Enter number"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Health Information -->
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+
+                            <i class="bi bi-heart-pulse"></i>
+
+                            <div>
+                                <h3>Health Information</h3>
+                                <p>Health-related details</p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+                            <!-- Smoker -->
+                            <div class="form-group">
+
+                                <label for="smoker">
+                                    Smoking Status
+                                </label>
+
+                                <select
+                                    id="smoker"
+                                    name="smoker"
+                                    required
+                                >
+
+                                    <option value="" selected disabled>
+                                        Select status
+                                    </option>
+
+                                    <option value="0">
+                                        Non-Smoker
+                                    </option>
+
+                                    <option value="1">
+                                        Smoker
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- Region -->
+                            <div class="form-group">
+
+                                <label for="region">
+                                    Region
+                                </label>
+
+                                <select
+                                    id="region"
+                                    name="region"
+                                    required
+                                >
+
+                                    <option value="" selected disabled>
+                                        Select region
+                                    </option>
+
+                                    <option value="0">Southwest</option>
+                                    <option value="1">Southeast</option>
+                                    <option value="2">Northwest</option>
+                                    <option value="3">Northeast</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Insurance Information -->
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            <div>
+                                <h3>Insurance Information</h3>
+                                <p>Financial insurance details</p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-grid single-column">
+
+                            <!-- Charges -->
+                            <div class="form-group">
+
+                                <label for="charges">
+                                    Annual Insurance Charges
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="charges"
+                                    name="charges"
+                                    step="0.01"
+                                    min="0"
+                                    placeholder="Enter insurance charges"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Submit -->
+                    <button
+                        type="submit"
+                        class="btn btn-primary predict-button"
+                    >
+
+                        <i class="bi bi-stars"></i>
+
+                        Predict Insurance Claim
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- Information Side Card -->
+            <aside class="prediction-sidebar">
+
+                <div class="info-card">
+
+                    <div class="info-card-icon">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+
+                    <h3>How It Works</h3>
+
+                    <div class="info-steps">
+
+                        <div class="info-step">
+
+                            <span>1</span>
+
+                            <p>
+                                Enter insurance and customer details.
+                            </p>
+
+                        </div>
+
+
+                        <div class="info-step">
+
+                            <span>2</span>
+
+                            <p>
+                                Our trained ML model analyzes the data.
+                            </p>
+
+                        </div>
+
+
+                        <div class="info-step">
+
+                            <span>3</span>
+
+                            <p>
+                                Get an instant insurance claim prediction.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="model-card">
+
+                    <div class="model-card-top">
+
+                        <i class="bi bi-cpu"></i>
+
+                        <span>ML MODEL</span>
+
+                    </div>
+
+                    <h3>Random Forest</h3>
+
+                    <p>
+                        Our final trained machine learning model.
+                    </p>
+
+                    <div class="model-score">
+
+                        <span>Accuracy</span>
+
+                        <strong>95.52%</strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="disclaimer-card">
+
+                    <i class="bi bi-info-circle"></i>
+
+                    <p>
+                        This prediction is generated for educational purposes
+                        and should not be considered a final insurance decision.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+
+        <!-- PREDICTION RESULT -->
+        {% if prediction_result %}
+
+        <div class="prediction-result-card">
+
+            <div class="result-main">
+
+                <div class="result-icon">
+
+                    {% if prediction_result == "Claim Likely" %}
+
+                        <i class="bi bi-exclamation-triangle"></i>
+
+                    {% else %}
+
+                        <i class="bi bi-shield-check"></i>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="result-content">
+
+                    <span class="result-label">
+                        AI PREDICTION RESULT
+                    </span>
+
+                    <h2>
+                        {{ prediction_result }}
+                    </h2>
+
+                    <p>
+                        The machine learning model has analyzed the
+                        information you provided.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="probability-box">
+
+                <span>
+                    Prediction Probability
+                </span>
+
+                <strong>
+                    {{ probability }}%
+                </strong>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

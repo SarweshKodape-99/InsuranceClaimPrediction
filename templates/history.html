@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History | InsurePredict{% endblock %}
+
+{% block content %}
+
+<section class="history-page">
+
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="page-header history-header">
+
+            <div>
+
+                <span class="section-tag">
+                    PREDICTION HISTORY
+                </span>
+
+                <h1>Your Prediction History</h1>
+
+                <p>
+                    View and review all your previous insurance claim
+                    predictions.
+                </p>
+
+            </div>
+
+            <a href="/predict" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                New Prediction
+            </a>
+
+        </div>
+
+
+        <!-- History Statistics -->
+        <div class="history-stats">
+
+            <div class="history-stat-card">
+
+                <div class="stat-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+
+                <div>
+                    <span>Total Predictions</span>
+                    <h2>{{ total_predictions or 0 }}</h2>
+                </div>
+
+            </div>
+
+
+            <div class="history-stat-card">
+
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+
+                <div>
+                    <span>Latest Prediction</span>
+
+                    <h2>
+                        {% if predictions %}
+                            Available
+                        {% else %}
+                            No Data
+                        {% endif %}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- History Table -->
+        <div class="history-card">
+
+            <div class="history-card-header">
+
+                <div>
+
+                    <h2>All Predictions</h2>
+
+                    <p>
+                        A complete record of your insurance claim predictions.
+                    </p>
+
+                </div>
+
+                <div class="table-icon">
+                    <i class="bi bi-table"></i>
+                </div>
+
+            </div>
+
+
+            {% if predictions %}
+
+            <div class="table-responsive">
+
+                <table class="history-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>#</th>
+                            <th>Age</th>
+                            <th>BMI</th>
+                            <th>Smoker</th>
+                            <th>Charges</th>
+                            <th>Result</th>
+                            <th>Probability</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for prediction in predictions %}
+
+                        <tr>
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+                            <td>
+                                {{ prediction.age }}
+                            </td>
+
+                            <td>
+                                {{ prediction.bmi }}
+                            </td>
+
+                            <td>
+
+                                {% if prediction.smoker == 1 %}
+
+                                    <span class="status-badge smoker">
+                                        Smoker
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge non-smoker">
+                                        Non-Smoker
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                ₹{{ "%.2f"|format(prediction.charges) }}
+                            </td>
+
+
+                            <td>
+
+                                {% if prediction.prediction_result == "Claim Likely" %}
+
+                                    <span class="result-badge claim-likely">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        Claim Likely
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="result-badge claim-unlikely">
+                                        <i class="bi bi-check-circle"></i>
+                                        Claim Unlikely
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="probability-value">
+
+                                    <strong>
+                                        {{ "%.2f"|format(prediction.probability) }}%
+                                    </strong>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                {{ prediction.prediction_date.strftime('%d %b %Y') }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {% else %}
+
+            <!-- Empty State -->
+
+            <div class="empty-state history-empty">
+
+                <div class="empty-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <h3>No Prediction History</h3>
+
+                <p>
+                    You haven't made any insurance claim predictions yet.
+                </p>
+
+                <a href="/predict" class="btn btn-primary">
+
+                    <i class="bi bi-stars"></i>
+
+                    Make Your First Prediction
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
