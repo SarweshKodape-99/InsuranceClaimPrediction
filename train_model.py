@@ -1,10 +1,10 @@
-import os
 import pandas as pd
 import joblib
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -17,149 +17,189 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    roc_auc_score,
-    confusion_matrix
+    roc_auc_score
 )
 
 
-# ==============================
+# ==========================================
 # 1. LOAD DATASET
-# ==============================
+# ==========================================
 
-print("\nLoading dataset...")
+dataset_path = "dataset/Insurance.csv"
 
-df = pd.read_csv("dataset/Insurance.csv")
+df = pd.read_csv(dataset_path)
 
-print("Dataset loaded successfully!")
+print("\nDataset loaded successfully!")
 print("Dataset shape:", df.shape)
 
+print("\nColumns:")
+print(df.columns.tolist())
 
-# ==============================
-# 2. PREPARE FEATURES AND TARGET
-# ==============================
+
+# ==========================================
+# 2. SEPARATE FEATURES AND TARGET
+# ==========================================
 
 X = df.drop("insuranceclaim", axis=1)
 y = df["insuranceclaim"]
 
-print("\nFeatures:")
-print(X.columns.tolist())
 
-print("\nTarget:")
-print("insuranceclaim")
+# ==========================================
+# 3. DEFINE NUMERICAL FEATURES
+# ==========================================
+
+numeric_features = [
+    "age",
+    "bmi",
+    "children",
+    "annual_medical_expenses"
+]
 
 
-# ==============================
-# 3. TRAIN-TEST SPLIT
-# ==============================
+# ==========================================
+# 4. DEFINE CATEGORICAL FEATURES
+# ==========================================
+
+categorical_features = [
+    "sex",
+    "smoker",
+    "medical_condition",
+    "chronic_disease",
+    "alcohol_consumption",
+    "family_history"
+]
+
+
+# ==========================================
+# 5. PREPROCESSING
+# ==========================================
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        (
+            "numeric",
+            StandardScaler(),
+            numeric_features
+        ),
+        (
+            "categorical",
+            OneHotEncoder(handle_unknown="ignore"),
+            categorical_features
+        )
+    ]
+)
+
+
+# ==========================================
+# 6. SPLIT DATA
+# ==========================================
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
-    test_size=0.2,
+    test_size=0.20,
     random_state=42,
     stratify=y
 )
 
-print("\nTraining samples:", X_train.shape[0])
-print("Testing samples:", X_test.shape[0])
+print("\nTraining samples:", len(X_train))
+print("Testing samples:", len(X_test))
 
 
-# ==============================
-# 4. DEFINE MODELS
-# ==============================
+# ==========================================
+# 7. CREATE MODELS
+# ==========================================
 
 models = {
-    "Logistic Regression": Pipeline([
-        ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=1000))
-    ]),
 
-    "Decision Tree": DecisionTreeClassifier(
-        random_state=42
-    ),
+    "Logistic Regression":
+        LogisticRegression(
+            max_iter=2000,
+            random_state=42
+        ),
 
-    "Random Forest": RandomForestClassifier(
-        n_estimators=200,
-        random_state=42
-    ),
+    "Decision Tree":
+        DecisionTreeClassifier(
+            random_state=42
+        ),
 
-    "KNN": Pipeline([
-        ("scaler", StandardScaler()),
-        ("model", KNeighborsClassifier())
-    ]),
+    "Random Forest":
+        RandomForestClassifier(
+            n_estimators=300,
+            random_state=42,
+            n_jobs=-1
+        ),
 
-    "SVM": Pipeline([
-        ("scaler", StandardScaler()),
-        ("model", SVC(
+    "KNN":
+        KNeighborsClassifier(
+            n_neighbors=5
+        ),
+
+    "SVM":
+        SVC(
             probability=True,
             random_state=42
-        ))
-    ])
+        )
 }
 
 
-# ==============================
-# 5. TRAIN AND EVALUATE MODELS
-# ==============================
+# ==========================================
+# 8. TRAIN AND EVALUATE MODELS
+# ==========================================
 
 results = []
-best_model = None
-best_model_name = ""
-best_accuracy = 0
+
+trained_models = {}
 
 
-print("\n" + "=" * 60)
-print("MODEL TRAINING AND EVALUATION")
-print("=" * 60)
+for model_name, model in models.items():
 
+    print("\nTraining:", model_name)
 
-for name, model in models.items():
+    pipeline = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("model", model)
+        ]
+    )
 
-    print(f"\nTraining {name}...")
+    # Train
+    pipeline.fit(X_train, y_train)
 
-    # Train model
-    model.fit(X_train, y_train)
+    # Predict
+    y_pred = pipeline.predict(X_test)
 
-    # Predictions
-    y_pred = model.predict(X_test)
-
-    # Probabilities
-    if hasattr(model, "predict_proba"):
-        y_prob = model.predict_proba(X_test)[:, 1]
-    else:
-        y_prob = None
+    # Prediction probability
+    y_probability = pipeline.predict_proba(X_test)[:, 1]
 
     # Metrics
     accuracy = accuracy_score(y_test, y_pred)
+
     precision = precision_score(
         y_test,
         y_pred,
         zero_division=0
     )
+
     recall = recall_score(
         y_test,
         y_pred,
         zero_division=0
     )
+
     f1 = f1_score(
         y_test,
         y_pred,
         zero_division=0
     )
 
-    if y_prob is not None:
-        roc_auc = roc_auc_score(y_test, y_prob)
-    else:
-        roc_auc = 0
-
-    print(f"Accuracy:  {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall:    {recall:.4f}")
-    print(f"F1 Score:  {f1:.4f}")
-    print(f"ROC-AUC:   {roc_auc:.4f}")
+    roc_auc = roc_auc_score(
+        y_test,
+        y_probability
+    )
 
     results.append({
-        "Model": name,
+        "Model": model_name,
         "Accuracy": accuracy,
         "Precision": precision,
         "Recall": recall,
@@ -167,76 +207,99 @@ for name, model in models.items():
         "ROC-AUC": roc_auc
     })
 
-    # Save best model based on accuracy
-    if accuracy > best_accuracy:
-        best_accuracy = accuracy
-        best_model = model
-        best_model_name = name
+    trained_models[model_name] = pipeline
+
+    print("Accuracy :", round(accuracy, 4))
+    print("Precision:", round(precision, 4))
+    print("Recall   :", round(recall, 4))
+    print("F1 Score :", round(f1, 4))
+    print("ROC-AUC  :", round(roc_auc, 4))
 
 
-# ==============================
-# 6. DISPLAY RESULTS
-# ==============================
+# ==========================================
+# 9. MODEL COMPARISON
+# ==========================================
 
 results_df = pd.DataFrame(results)
 
-print("\n" + "=" * 60)
-print("MODEL COMPARISON")
-print("=" * 60)
-
-print(results_df.to_string(index=False))
-
-
-# ==============================
-# 7. CONFUSION MATRIX
-# ==============================
-
-best_predictions = best_model.predict(X_test)
-
-cm = confusion_matrix(
-    y_test,
-    best_predictions
+results_df = results_df.sort_values(
+    by=["ROC-AUC", "F1 Score"],
+    ascending=False
 )
 
-print("\nBest Model:", best_model_name)
-print(f"Best Accuracy: {best_accuracy:.4f}")
+print("\n")
+print("=" * 70)
+print("MODEL COMPARISON")
+print("=" * 70)
 
-print("\nConfusion Matrix:")
-print(cm)
+print(
+    results_df.to_string(
+        index=False,
+        float_format=lambda x: f"{x:.4f}"
+    )
+)
 
 
-# ==============================
-# 8. SAVE MODEL
-# ==============================
+# ==========================================
+# 10. SELECT BEST MODEL
+# ==========================================
 
-# ==============================
-# 8. SAVE FINAL MODEL
-# ==============================
+best_model_name = results_df.iloc[0]["Model"]
+
+best_model = trained_models[best_model_name]
+
+print("\n")
+print("=" * 70)
+print("BEST MODEL")
+print("=" * 70)
+
+print("Selected Model:", best_model_name)
+
+
+# ==========================================
+# 11. CREATE MODELS FOLDER
+# ==========================================
+
+import os
 
 os.makedirs("models", exist_ok=True)
 
-# Use Random Forest as the final model
-final_model = models["Random Forest"]
+
+# ==========================================
+# 12. SAVE BEST MODEL
+# ==========================================
 
 model_path = "models/insurance_claim_model.pkl"
 
-joblib.dump(final_model, model_path)
+joblib.dump(
+    best_model,
+    model_path
+)
 
-print("\n" + "=" * 60)
-print("FINAL MODEL SAVED SUCCESSFULLY!")
-print("=" * 60)
-
-print("Final Model: Random Forest")
-print("Model saved at:", model_path)
+print("\nModel saved successfully!")
+print("Location:", model_path)
 
 
-# ==============================
-# 9. SAVE MODEL RESULTS
-# ==============================
+# ==========================================
+# 13. SAVE MODEL RESULTS
+# ==========================================
+
+results_path = "models/model_results.csv"
 
 results_df.to_csv(
-    "models/model_results.csv",
+    results_path,
     index=False
 )
 
-print("Results saved at: models/model_results.csv")
+print("Model results saved successfully!")
+print("Location:", results_path)
+
+
+# ==========================================
+# 14. FINISHED
+# ==========================================
+
+print("\n")
+print("=" * 70)
+print("MODEL TRAINING COMPLETED SUCCESSFULLY!")
+print("=" * 70)

@@ -121,53 +121,6 @@
 
     </main>
 
-
-    <!-- Footer -->
-    <footer class="footer">
-
-        <div class="container footer-container">
-
-            <div>
-
-                <div class="footer-logo">
-                    <i class="bi bi-shield-check"></i>
-                    InsurePredict
-                </div>
-
-                <p>
-                    AI-powered insurance claim prediction for
-                    smarter and faster decision-making.
-                </p>
-
-            </div>
-
-
-            <div class="footer-links">
-
-                <a href="/">Home</a>
-
-                {% if session.get('user_id') %}
-                    <a href="/dashboard">Dashboard</a>
-                    <a href="/predict">Prediction</a>
-                {% else %}
-                    <a href="/login">Login</a>
-                    <a href="/register">Register</a>
-                {% endif %}
-
-            </div>
-
-        </div>
-
-
-        <div class="footer-bottom">
-            <p>
-                © 2026 InsurePredict — Insurance Claim Prediction System
-            </p>
-        </div>
-
-    </footer>
-
-
     <!-- Main JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 

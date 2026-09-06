@@ -26,7 +26,7 @@
 
             </div>
 
-            <a href="/predict" class="btn btn-primary">
+            <a href="{{ url_for('predict') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i>
                 New Prediction
             </a>
@@ -108,9 +108,14 @@
                         <tr>
                             <th>#</th>
                             <th>Age</th>
+                            <th>Gender</th>
                             <th>BMI</th>
                             <th>Smoker</th>
-                            <th>Charges</th>
+                            <th>Medical Condition</th>
+                            <th>Chronic Disease</th>
+                            <th>Alcohol</th>
+                            <th>Family History</th>
+                            <th>Annual Medical Expenses</th>
                             <th>Result</th>
                             <th>Probability</th>
                             <th>Date</th>
@@ -125,18 +130,35 @@
 
                         <tr>
 
+                            <!-- Number -->
                             <td>
                                 {{ loop.index }}
                             </td>
 
+
+                            <!-- Age -->
                             <td>
                                 {{ prediction.age }}
                             </td>
 
+
+                            <!-- Gender -->
                             <td>
-                                {{ prediction.bmi }}
+                                {% if prediction.sex == 1 %}
+                                    Male
+                                {% else %}
+                                    Female
+                                {% endif %}
                             </td>
 
+
+                            <!-- BMI -->
+                            <td>
+                                {{ "%.2f"|format(prediction.bmi) }}
+                            </td>
+
+
+                            <!-- Smoker -->
                             <td>
 
                                 {% if prediction.smoker == 1 %}
@@ -156,11 +178,61 @@
                             </td>
 
 
+                            <!-- Medical Condition -->
                             <td>
-                                ₹{{ "%.2f"|format(prediction.charges) }}
+                                {{ prediction.medical_condition }}
                             </td>
 
 
+                            <!-- Chronic Disease -->
+                            <td>
+
+                                {% if prediction.chronic_disease == "Yes" %}
+
+                                    <span class="status-badge smoker">
+                                        Yes
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge non-smoker">
+                                        No
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Alcohol -->
+                            <td>
+                                {{ prediction.alcohol_consumption }}
+                            </td>
+
+
+                            <!-- Family History -->
+                            <td>
+
+                                {% if prediction.family_history == "Yes" %}
+
+                                    Yes
+
+                                {% else %}
+
+                                    No
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Annual Medical Expenses -->
+                            <td>
+                                ₹{{ "%.2f"|format(prediction.annual_medical_expenses) }}
+                            </td>
+
+
+                            <!-- Result -->
                             <td>
 
                                 {% if prediction.prediction_result == "Claim Likely" %}
@@ -174,7 +246,7 @@
 
                                     <span class="result-badge claim-unlikely">
                                         <i class="bi bi-check-circle"></i>
-                                        Claim Unlikely
+                                        Claim Not Likely
                                     </span>
 
                                 {% endif %}
@@ -182,6 +254,7 @@
                             </td>
 
 
+                            <!-- Probability -->
                             <td>
 
                                 <div class="probability-value">
@@ -195,6 +268,7 @@
                             </td>
 
 
+                            <!-- Date -->
                             <td>
                                 {{ prediction.prediction_date.strftime('%d %b %Y') }}
                             </td>
@@ -226,7 +300,7 @@
                     You haven't made any insurance claim predictions yet.
                 </p>
 
-                <a href="/predict" class="btn btn-primary">
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">
 
                     <i class="bi bi-stars"></i>
 

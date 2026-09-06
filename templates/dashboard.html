@@ -12,7 +12,6 @@
         <div class="dashboard-header">
 
             <div>
-
                 <span class="section-tag">
                     DASHBOARD
                 </span>
@@ -22,26 +21,22 @@
                 </h1>
 
                 <p>
-                    View your prediction activity and manage your insurance
-                    claim predictions.
+                    Here's a quick overview of your insurance predictions.
                 </p>
-
             </div>
 
-            <a href="/predict" class="btn btn-primary">
-
+            <a href="{{ url_for('predict') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i>
-
                 New Prediction
-
             </a>
 
         </div>
 
 
-        <!-- Statistics Cards -->
+        <!-- Statistics -->
         <div class="stats-grid">
 
+            <!-- Total Predictions -->
             <div class="stat-card">
 
                 <div class="stat-icon">
@@ -49,16 +44,29 @@
                 </div>
 
                 <div>
-
                     <span>Total Predictions</span>
-
                     <h2>{{ total_predictions or 0 }}</h2>
-
                 </div>
 
             </div>
 
 
+            <!-- Claims Likely -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <i class="bi bi-exclamation-circle"></i>
+                </div>
+
+                <div>
+                    <span>Claims Likely</span>
+                    <h2>{{ claims_likely or 0 }}</h2>
+                </div>
+
+            </div>
+
+
+            <!-- Claims Not Likely -->
             <div class="stat-card">
 
                 <div class="stat-icon">
@@ -66,32 +74,8 @@
                 </div>
 
                 <div>
-
-                    <span>Latest Result</span>
-
-                    <h2 class="stat-result">
-                        {{ latest_result or "No Data" }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    <i class="bi bi-calendar-check"></i>
-                </div>
-
-                <div>
-
-                    <span>Account Status</span>
-
-                    <h2 class="active-status">
-                        Active
-                    </h2>
-
+                    <span>Claims Not Likely</span>
+                    <h2>{{ claims_not_likely or 0 }}</h2>
                 </div>
 
             </div>
@@ -99,70 +83,86 @@
         </div>
 
 
-        <!-- Quick Actions -->
-        <div class="dashboard-section">
+        <!-- Latest Prediction -->
+        <div class="dashboard-section latest-section">
 
             <div class="section-title">
 
                 <div>
-
-                    <h2>Quick Actions</h2>
+                    <h2>Latest Prediction</h2>
 
                     <p>
-                        Access the main features of the system.
+                        Your most recent insurance claim prediction.
                     </p>
-
                 </div>
 
             </div>
 
 
-            <div class="action-grid">
+            {% if latest_result %}
 
-                <a href="/predict" class="action-card">
+            <div class="latest-prediction-card">
 
-                    <div class="action-icon">
-                        <i class="bi bi-cpu"></i>
-                    </div>
+                <div class="latest-result-icon">
 
-                    <div>
+                    {% if latest_result == "Claim Likely" %}
 
-                        <h3>Make Prediction</h3>
+                        <i class="bi bi-exclamation-circle"></i>
 
-                        <p>
-                            Enter insurance information and get
-                            an AI-powered prediction.
-                        </p>
+                    {% else %}
 
-                    </div>
+                        <i class="bi bi-check-circle"></i>
 
-                    <i class="bi bi-arrow-right action-arrow"></i>
+                    {% endif %}
 
-                </a>
+                </div>
 
 
-                <a href="/history" class="action-card">
+                <div class="latest-result-content">
 
-                    <div class="action-icon">
-                        <i class="bi bi-clock-history"></i>
-                    </div>
+                    <span class="result-label">
+                        Prediction Result
+                    </span>
 
-                    <div>
+                    <h2>
+                        {{ latest_result }}
+                    </h2>
 
-                        <h3>Prediction History</h3>
+                </div>
 
-                        <p>
-                            View your previous insurance claim
-                            predictions.
-                        </p>
 
-                    </div>
+                <div class="latest-actions">
 
-                    <i class="bi bi-arrow-right action-arrow"></i>
+                    <a href="{{ url_for('history') }}" class="text-link">
+                        View History
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
 
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-state latest-empty">
+
+                <div class="empty-icon">
+                    <i class="bi bi-stars"></i>
+                </div>
+
+                <h3>No Prediction Yet</h3>
+
+                <p>
+                    Make your first prediction to see your result here.
+                </p>
+
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                    Make Prediction
                 </a>
 
             </div>
+
+            {% endif %}
 
         </div>
 
@@ -173,16 +173,14 @@
             <div class="section-title">
 
                 <div>
-
                     <h2>Recent Predictions</h2>
 
                     <p>
-                        Your latest insurance claim prediction activity.
+                        Your latest prediction activity.
                     </p>
-
                 </div>
 
-                <a href="/history" class="text-link">
+                <a href="{{ url_for('history') }}" class="text-link">
                     View All
                     <i class="bi bi-arrow-right"></i>
                 </a>
@@ -192,72 +190,77 @@
 
             {% if recent_predictions %}
 
-                <div class="recent-predictions">
+            <div class="recent-predictions">
 
-                    {% for prediction in recent_predictions %}
+                {% for prediction in recent_predictions %}
 
-                        <div class="recent-prediction-card">
+                <div class="recent-prediction-card">
 
-                            <div class="prediction-result-icon">
+                    <div class="prediction-result-icon">
 
-                                {% if prediction.prediction_result == "Claim Likely" %}
+                        {% if prediction.prediction_result == "Claim Likely" %}
 
-                                    <i class="bi bi-exclamation-circle"></i>
+                            <i class="bi bi-exclamation-circle"></i>
 
-                                {% else %}
+                        {% else %}
 
-                                    <i class="bi bi-check-circle"></i>
+                            <i class="bi bi-check-circle"></i>
 
-                                {% endif %}
+                        {% endif %}
 
-                            </div>
-
-
-                            <div class="prediction-info">
-
-                                <h3>
-                                    {{ prediction.prediction_result }}
-                                </h3>
-
-                                <p>
-                                    Probability:
-                                    {{ prediction.probability }}%
-                                </p>
-
-                            </div>
+                    </div>
 
 
-                            <div class="prediction-date">
+                    <div class="prediction-info">
 
-                                {{ prediction.prediction_date }}
+                        <h3>
+                            {{ prediction.prediction_result }}
+                        </h3>
 
-                            </div>
+                        <p>
+                            Probability:
+                            <strong>{{ "%.2f"|format(prediction.probability) }}%</strong>
+                        </p>
 
-                        </div>
+                    </div>
 
-                    {% endfor %}
+
+                    <div class="prediction-date">
+
+                        {% if prediction.prediction_date %}
+
+                            {{ prediction.prediction_date.strftime('%d %b %Y') }}
+
+                        {% endif %}
+
+                    </div>
 
                 </div>
+
+                {% endfor %}
+
+            </div>
+
 
             {% else %}
 
-                <div class="empty-state">
+            <div class="empty-state">
 
-                    <div class="empty-icon">
-                        <i class="bi bi-bar-chart"></i>
-                    </div>
-
-                    <h3>No Predictions Yet</h3>
-
-                    <p>
-                        Start by making your first insurance claim prediction.
-                    </p>
-
-                    <a href="/predict" class="btn btn-primary">
-                        Make First Prediction
-                    </a>
-
+                <div class="empty-icon">
+                    <i class="bi bi-clock-history"></i>
                 </div>
+
+                <h3>No Predictions Yet</h3>
+
+                <p>
+                    Start by making your first insurance claim prediction.
+                </p>
+
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                    Make First Prediction
+                </a>
+
+            </div>
 
             {% endif %}
 
